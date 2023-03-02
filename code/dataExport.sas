@@ -19,7 +19,6 @@ quit;
 
 /* Connect to CAS and assign the libraries */
 cas mySess;
-libname casuser cas caslib="casuser";
 libname cassrc cas caslib="&caslib" ;
 
 /* Define list of variables */
