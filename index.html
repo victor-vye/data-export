@@ -84,8 +84,7 @@
       // Retrieve export file content from the server
       const fileContent = await fetch(fileUrl, {method: "GET", credentials: "include"})
       // Convert the export file to a file which can be downloaded when VA and app are hosted on different domains
-      const fileText = await fileContent.text()
-      const fileStorage = new Blob([fileText], {type:"text/plain"})
+      const fileStorage = await fileContent.blob()
       // Create the anchor which will be used to download the file
       const message = `<a href="${window.URL.createObjectURL(fileStorage)}" download="SASVisualAnalyticsExport.txt" target="_blank">here</a>`
       return message
