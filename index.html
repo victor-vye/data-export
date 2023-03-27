@@ -12,9 +12,9 @@
   <div id="status"></div>
   <script>
     // Define jobLocation
-    const jobLocation = "/Users/sbxxab/My Folder/dataExport"
+    const jobLocation = "/SEI/iNEGO/Appli/Jobs/Job_DDC_Export"
     // Define baseUrl
-    const baseUrl = window.location != window.parent.location ? document.referrer : document.location.ancestorOrigins[0]
+    const baseUrl = document.location.ancestorOrigins[0]
     // Execute a job
     const executeJob = async (baseUrl, job, data) => {
       // Retrieve data from VA object
@@ -42,8 +42,9 @@
         // Return a filter object
         return {"label": name, "operator": operator, "value": value, "dataType": parameter.dataType }
       })
+      console.log(filters)
       // URL to retrieve a CSRF token for SAS Job Execution
-      const csrfURL = `${baseUrl}SASJobExecution/csrf`
+      const csrfURL = `${baseUrl}/SASJobExecution/csrf`
       // Get CSRF token for SAS Job Execution
       const csrfRequest = await fetch(csrfURL, { method: "GET", credentials: "include" })
       // Read CSRF token
@@ -64,7 +65,7 @@
       // Convert the parameters to URLSearchParams
       const urlParameters = new URLSearchParams(jobParameters)
       // Call job
-      const jobURL = `${baseUrl}SASJobExecution/?${urlParameters}`
+      const jobURL = `${baseUrl}/SASJobExecution/?${urlParameters}`
       const response = await fetch(jobURL, {
         method: "POST",
         headers: jobHeaders,
@@ -84,9 +85,11 @@
       // Retrieve export file content from the server
       const fileContent = await fetch(fileUrl, {method: "GET", credentials: "include"})
       // Convert the export file to a file which can be downloaded when VA and app are hosted on different domains
+      //const fileText = await fileContent.text()
+      //const fileStorage = new Blob([fileText], {type:"text/plain"})
       const fileStorage = await fileContent.blob()
       // Create the anchor which will be used to download the file
-      const message = `<a href="${window.URL.createObjectURL(fileStorage)}" download="SASVisualAnalyticsExport.txt" target="_blank">here</a>`
+      const message = `<a href="${window.URL.createObjectURL(fileStorage)}" download="SASVisualAnalyticsExport.xlsx" target="_blank">here</a>`
       return message
     }
 
@@ -109,14 +112,13 @@
         }
       }
     }
-
     // Add listener to detect VA data reception
     if (window.addEventListener) {
       window.addEventListener("message", (event) => onMessage(event, jobLocation), false)
      } else {
        window.attachEvent("onmessage",  (event) => onMessage(event, jobLocation))
      }
-  </script>
+  </script>  
 </body>
 
 </html>
