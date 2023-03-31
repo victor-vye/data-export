@@ -96,7 +96,7 @@
     // Retrieve data and begin processing
     const onMessage = async (event, jobLocation) => {
       // Generate information message to indicate that the job is running
-      document.getElementById("status").innerHTML = "Generating file for download ..."
+      document.getElementById("status").innerText = "Generating file for download ..."
       // Check if the app received data from VA
       if (event && event.data) {
         // Execute the job
@@ -108,7 +108,7 @@
           document.getElementById("status").innerHTML = `File can be downloaded ${link}!`
         } else {
           // Generate information that the job failed
-          document.getElementById("status").innerHTML = 'Failed to generate the file. Please contact an administrator to check the SAS Job Execution log.'
+          document.getElementById("status").innerText = 'Failed to generate the file. Please contact an administrator to check the SAS Job Execution log.'
         }
       }
     }
