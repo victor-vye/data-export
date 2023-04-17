@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-export
+  labels:
+    app: data-export
+    app.kubernetes.io/part-of: data-export
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-export
+  template:
+    metadata:
+      labels:
+        app: data-export
+        app.kubernetes.io/part-of: data-export
+    spec:		
+      volumes:
+        - name: tmp-volumecache
+          emptyDir: {}	
+        - name: tmp-volumerun
+          emptyDir: {}	
+      containers:
+        - name: data-export
+          image: seiacrjackal.azurecr.io/data-export/data-export
+          imagePullPolicy: Always
+          securityContext: 
+            allowPrivilegeEscalation: false 
+            privileged: false 
+            readOnlyRootFilesystem: true 			   
+          volumeMounts:
+          - mountPath: /var/cache/nginx/
+            name: tmp-volumecache
+          - mountPath: /var/run/
+            name: tmp-volumerun
+          ports:
+            - containerPort: 80
+              name: data-export
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-export-service
+  labels:
+    app: data-export-service
+    app.kubernetes.io/part-of: data-export
+spec:
+  ports:
+    - name: data-export-port
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: data-export
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: data-export-ingress
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: inegodev.ondemand.sas.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: data-export-service
+                port:
+                  number: 80
+            path: /data-export
+            pathType: Prefix
+    - host: '*.inegodev.ondemand.sas.com'
+      http:
+        paths:
+          - backend:
+              service:
+                name: data-export-service
+                port:
+                  number: 80
+            path: /data-export
+            pathType: Prefix
+  tls:
+  - hosts:
+    - inegodev.ondemand.sas.com
+    - '*.inegodev.ondemand.sas.com'
+    secretName: sas-ingress-certificate
+
+
+
+
+
+
+
